@@ -26,5 +26,12 @@ public class Constants {
     //Arm Positions
     public static final double armFloorPosition = 0;
 
+    public static final class SwerveConstants {
+        public static final double MaxSpeed = 6;
+        public static final double MaxAngularSpeed = 4 * Math.PI;
+    }
+
+
+
 
 }

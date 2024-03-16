@@ -7,7 +7,6 @@ package frc.robot.commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
@@ -17,11 +16,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve;
+import frc.robot.Constants;
 
 public class SwerveDriveControl extends Command {
   private Swerve m_Swerve;
-  private double MaxSpeed = 6; // 6 meters per second desired top speed
-  private double MaxAngularRate = 4 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private double MaxSpeed = Constants.SwerveConstants.MaxSpeed; // 6 meters per second desired top speed
+  private double MaxAngularRate = Constants.SwerveConstants.MaxAngularSpeed; // 3/4 of a rotation per second max angular velocity
 
   private DoubleSupplier xSup;
   private DoubleSupplier ySup;
