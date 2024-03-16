@@ -4,74 +4,54 @@
 
 package frc.robot;
 
-import java.util.function.BooleanSupplier;
-
 import com.ctre.phoenix6.Utils;
-
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Arm.Arm;
-import frc.robot.subsystems.Vision.Limelight;
-import frc.robot.ScoringTarget.Position;
 import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 
 public class RobotContainer {
-  private double MaxSpeed = 6; // 6 meters per second desired top speed
-  private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  private double MaxSpeed = 2.5; // kSpeedAt12VoltsMps desired top speed
+  private double MaxAngularRate = 1. * Math.PI; // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
-    private final CommandXboxController joystick2 = new CommandXboxController(1); // My joystick
+  private final XboxController xbox2 = new XboxController(1);
+  private final Swerve drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  private final Manipulator manipulator = new Manipulator();
+  private final SendableChooser<Command> autoChooser;
   
-  private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
-
-  private final Shooter shooter = new Shooter();
-
-  private final Arm arm = new Arm();
-
-  //Limelight vision = new Limelight();
-
+  
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
+                                                               // driving in open loop
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
-  private final SendableChooser<Command> autoChooser;  
-  
-  public RobotContainer() {
-    configureBindings();
-
-    NamedCommands.registerCommand("armToScore", new Score(arm));
-    NamedCommands.registerCommand("intakeSetpoint", new ArmToIntake(arm));
-    NamedCommands.registerCommand("stowArm", new ArmToStow(arm));
-    NamedCommands.registerCommand("getShooterSpunUp", new AutoShooterCommand(shooter));
-    NamedCommands.registerCommand("feederNoteIn", new IntakeNote(shooter));
-    NamedCommands.registerCommand("shootNote", new InstantCommand(() -> shooter.feederShootNow()));
-    NamedCommands.registerCommand("feederStop", new InstantCommand(() -> shooter.feederStop()));
-    NamedCommands.registerCommand("shooterStop", new InstantCommand(() -> shooter.ShooterStop()));
-
-    autoChooser = AutoBuilder.buildAutoChooser();
-    autoChooser.addOption("No Auto", null);
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-  }
+  // triggers
+  public Trigger driverY = new Trigger(()->xbox2.getYButton());
+  public Trigger padUp = new Trigger(()->(xbox2.getPOV()==0));
+  public Trigger padDown = new Trigger(()->(xbox2.getPOV()==180));
 
   private void configureBindings() {
-
+    
+    
     drivetrain.setDefaultCommand(
       new SwerveDriveControl(
         drivetrain, 
@@ -87,45 +67,37 @@ public class RobotContainer {
       )
     );
 
-    //shooter.setDefaultCommand(new FeederControl(shooter, joystick.leftBumper(), joystick.leftTrigger()));
-
-    arm.setDefaultCommand(new ArmControl(arm, () -> -joystick2.getRightY(), () -> -joystick2.getLeftY()));
-
-    joystick2.a().onTrue(new InstantCommand(() -> ScoringTarget.setTarget(Position.SUBWOOFER)));
-    joystick2.b().onTrue(new InstantCommand(() -> ScoringTarget.setTarget(Position.AMP)));
-      // joystick2.a().whileTrue(shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      // joystick2.b().whileTrue(shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-      // joystick2.x().whileTrue(shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-      // joystick2.y().whileTrue(shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-
-
-     joystick.povUp().whileTrue(new InstantCommand(() -> shooter.setShooterSpeed(75)));
-
-    //joystick.leftBumper().whileTrue(new ArmToIntake(arm).andThen(new RunCommand(() -> shooter.feederIn())));
-    //joystick.leftBumper().whileTrue(new ArmToIntake(arm).andThen(new RunCommand(() -> shooter.feederIn())));
-     joystick.leftBumper().whileTrue(new ArmToIntake(arm).andThen(new IntakeNote(shooter).andThen(new IntakeIndex(shooter))));
-
-    joystick.leftBumper().onFalse(new InstantCommand(() -> shooter.feederStop()).andThen(new ArmToStow(arm)));
-
-    joystick.leftTrigger().whileTrue(new ArmToIntake(arm).andThen(new RunCommand(() -> shooter.feederOut())));
-    joystick.leftTrigger().onFalse(new InstantCommand(()-> shooter.feederStop()));
-
-    joystick.rightTrigger().whileTrue(new ShooterControl(shooter, joystick.rightBumper()).alongWith(new Score(arm)));
-    joystick.rightTrigger().onFalse(new InstantCommand(() -> shooter.ShooterStop()).andThen(new ArmToStow(arm)));
-
-    
-    // reset the field-centric heading on left bumper press
     joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.setFieldRelative()));
 
-    // if (Utils.isSimulation()) {
-    //   drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
-    // }
+    if (Utils.isSimulation()) {
+      drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+    }
     drivetrain.registerTelemetry(logger::telemeterize);
-  } 
+
+    // Non-Swerve Bindings
+    // driverY.onTrue(new ArmPos(manipulator, 15));
+    padUp.whileTrue(new MoveArm(manipulator, Constants.armPower));
+    padDown.whileTrue(new MoveArm(manipulator, -Constants.armPower));
+
+  }
+
+  public void registerNamedCommands() {
+    NamedCommands.registerCommand("armToFloor", new ArmPos(manipulator, Constants.armFloorPosition));
+    NamedCommands.registerCommand("timedIntake", new TimedIntake(manipulator));
+    NamedCommands.registerCommand("autoShoot", new AutoShoot(manipulator, Constants.autoShootingVelocity));
+
+  }
+
+  public RobotContainer() {
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+    configureBindings();
+
+    registerNamedCommands();
+  }
 
   public Command getAutonomousCommand() {
-      return autoChooser.getSelected();
-   }
-
-
+    return autoChooser.getSelected();
+  }
 }
