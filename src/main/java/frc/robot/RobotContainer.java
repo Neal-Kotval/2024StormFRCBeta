@@ -32,16 +32,8 @@ public class RobotContainer {
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
   private final XboxController xbox2 = new XboxController(1);
   private final Swerve drivetrain = TunerConstants.DriveTrain; // My drivetrain
-  private final Manipulator manipulator = new Manipulator();
   private final SendableChooser<Command> autoChooser;
   
-  
-  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
-                                                               // driving in open loop
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   // triggers
@@ -73,18 +65,9 @@ public class RobotContainer {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
     drivetrain.registerTelemetry(logger::telemeterize);
-
-    // Non-Swerve Bindings
-    // driverY.onTrue(new ArmPos(manipulator, 15));
-    padUp.whileTrue(new MoveArm(manipulator, Constants.armPower));
-    padDown.whileTrue(new MoveArm(manipulator, -Constants.armPower));
-
   }
 
   public void registerNamedCommands() {
-    NamedCommands.registerCommand("armToFloor", new ArmPos(manipulator, Constants.armFloorPosition));
-    NamedCommands.registerCommand("timedIntake", new TimedIntake(manipulator));
-    NamedCommands.registerCommand("autoShoot", new AutoShoot(manipulator, Constants.autoShootingVelocity));
 
   }
 

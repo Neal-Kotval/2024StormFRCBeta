@@ -16,10 +16,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Swerve;
 
 public class SwerveDriveControl extends Command {
-  private CommandSwerveDrivetrain m_Swerve;
+  private Swerve m_Swerve;
   private double MaxSpeed = 6; // 6 meters per second desired top speed
   private double MaxAngularRate = 4 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
@@ -39,7 +39,7 @@ public class SwerveDriveControl extends Command {
   private SwerveRequest.FieldCentricFacingAngle driveAngle = new SwerveRequest.FieldCentricFacingAngle();
 
   /** Creates a new SwerveDriveControl. */
-  public SwerveDriveControl(CommandSwerveDrivetrain swerve, DoubleSupplier xSup, DoubleSupplier ySup, 
+  public SwerveDriveControl(Swerve swerve, DoubleSupplier xSup, DoubleSupplier ySup, 
                             DoubleSupplier rotationSup, BooleanSupplier halfSpeed, BooleanSupplier quarterSpeed,
                             BooleanSupplier zero, BooleanSupplier ninety, BooleanSupplier oneEighty, 
                             BooleanSupplier twoSeventy) {
