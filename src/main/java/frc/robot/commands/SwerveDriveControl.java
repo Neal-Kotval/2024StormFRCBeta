@@ -26,8 +26,8 @@ public class SwerveDriveControl extends Command {
   private DoubleSupplier xSup;
   private DoubleSupplier ySup;
   private DoubleSupplier rotationSup;
-  private BooleanSupplier m_halfSpeed;
-  private BooleanSupplier m_quarterSpeed;
+  // private BooleanSupplier m_halfSpeed;
+  // private BooleanSupplier m_quarterSpeed;
   private BooleanSupplier m_90, m_180, m_270, m_0;
   
   private double rotationVal, xVal, yVal;
@@ -47,8 +47,8 @@ public class SwerveDriveControl extends Command {
     this.ySup = ySup;
     this.xSup = xSup;
     this.rotationSup = rotationSup;
-    m_halfSpeed = halfSpeed;
-    m_quarterSpeed = quarterSpeed;
+    // m_halfSpeed = halfSpeed;
+    // m_quarterSpeed = quarterSpeed;
     m_0 = zero;
     m_90 = ninety;
     m_180 = oneEighty;
