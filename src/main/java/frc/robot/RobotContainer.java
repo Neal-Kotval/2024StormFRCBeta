@@ -41,13 +41,23 @@ public class RobotContainer {
   
   private final Telemetry logger = new Telemetry(MaxSpeed);
   private final SendableChooser<Command> autoChooser;
+  private final SendableChooser<Pose2d> poseChooser;
 
     public RobotContainer() {
     configureBindings();
 
     autoChooser = AutoBuilder.buildAutoChooser();
+    poseChooser = new SendableChooser<>();
+
+    poseChooser.setDefaultOption("Default Auto", Constants.PoseConstants.defaultPose);
+    poseChooser.addOption("Blue 1", Constants.PoseConstants.Blue1Pose);
+    poseChooser.addOption("Blue 2", Constants.PoseConstants.Blue2Pose);
+    poseChooser.addOption("Blue 3", Constants.PoseConstants.Blue3Pose);
     // autoChooser.addOption("No Auto", null);
     SmartDashboard.putData("Auto Chooser", autoChooser);
+    SmartDashboard.putData("Pose Chooser", poseChooser);
+
+
 
     // registerNamedCommands();
   }
@@ -84,5 +94,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  public Pose2d getPose() {
+    return poseChooser.getSelected();
   }
 }

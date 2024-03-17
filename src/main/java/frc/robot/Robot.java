@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,6 +21,7 @@ import frc.robot.subsystems.*;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
+  private Pose2d initialPose;
   private RobotContainer m_robotContainer;
 
   private final Swerve drivetrain = TunerConstants.DriveTrain;
@@ -33,7 +35,10 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    drivetrain.setPose(2.0,7.0,-26.57);
+
+    initialPose = m_robotContainer.getPose();
+    drivetrain.seedFieldRelative(initialPose);
+
   }
 
   /**
@@ -50,9 +55,10 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    SmartDashboard.putNumber("Pose X", drivetrain.getState().Pose.getX());
-    SmartDashboard.putNumber("Pose Y", drivetrain.getState().Pose.getY());
-    SmartDashboard.putNumber("Heading", drivetrain.getState().Pose.getRotation().getDegrees());
+    // drivetrain.setPose(0,0,0);
+    // SmartDashboard.putNumber("Pose X", drivetrain.getState().Pose.getX());
+    // SmartDashboard.putNumber("Pose Y", drivetrain.getState().Pose.getY());
+    // SmartDashboard.putNumber("Heading", drivetrain.getState().Pose.getRotation().getDegrees());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -71,6 +77,10 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+
+
+    
+    
   }
 
   /** This function is called periodically during autonomous. */

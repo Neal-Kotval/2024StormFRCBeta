@@ -31,6 +31,7 @@
       "/SmartDashboard/Module 1": "Mechanism2d",
       "/SmartDashboard/Module 2": "Mechanism2d",
       "/SmartDashboard/Module 3": "Mechanism2d",
+      "/SmartDashboard/Pose Chooser": "String Chooser",
       "/SmartDashboard/Shooter Throttle": "String Chooser",
       "/SmartDashboard/Speed Percent": "String Chooser"
     },
@@ -53,6 +54,11 @@
         }
       },
       "/SmartDashboard/Auto Chooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Pose Chooser": {
         "window": {
           "visible": true
         }
