@@ -150,6 +150,11 @@ public class Swerve extends SwerveDrivetrain implements Subsystem {
       }
     }
 
+    public void setPose(double x, double y, double heading){
+        Translation2d trans = new Translation2d(x,y);
+        this.seedFieldRelative(new Pose2d(trans, Rotation2d.fromDegrees(heading)));
+    }
+
     /*
      * Both the sysid commands are specific to one particular sysid routine, change
      * which one you're trying to characterize
